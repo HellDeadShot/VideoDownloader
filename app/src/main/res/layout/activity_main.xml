@@ -8,29 +8,45 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Status Bar -->
+        <TextView
+            android:id="@+id/statusBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF6200EE"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"
+            android:text="Status: Ready"
+            android:gravity="center" />
+
+
+        <!-- Input and Button -->
         <EditText
             android:id="@+id/urlInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Instagram reel URL"
-            android:inputType="textUri" />
+            android:hint="Enter video URL" />
 
         <Button
             android:id="@+id/downloadButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Download Video" />
+            android:text="Download"
+            android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp" />
+            android:paddingTop="16dp"
+            android:text="Status: Not Started" />
+
     </LinearLayout>
 
 

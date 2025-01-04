@@ -19,7 +19,7 @@ android {
 
         ndk {
             // On Apple silicon, you can omit x86_64.
-            abiFilters "arm64-v8a", "x86_64", "x86", "armeabi-v7a"
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
         python{
             version "3.8"
@@ -38,6 +38,12 @@ android {
         }
 
 
+    }
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
     }
 
     buildTypes {
@@ -70,8 +76,10 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
-    implementation("io.github.junkfood02.youtubedl-android:library:0.16.0")
-    implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.16.0")
+    implementation 'io.github.junkfood02.youtubedl-android:library:0.16.0'
+    implementation 'io.github.junkfood02.youtubedl-android:ffmpeg:0.16.0'
+    // Optional: for additional features
+    implementation 'io.github.junkfood02.youtubedl-android:aria2c:0.16.0'
 
 
 }

@@ -14,13 +14,13 @@ import com.yausername.youtubedl_android.YoutubeDL
 import com.yausername.youtubedl_android.YoutubeDLException
 import com.yausername.youtubedl_android.YoutubeDLRequest
 import java.io.File
-import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
 
         // Initialize YoutubeDL
         try {
@@ -43,24 +43,28 @@ class MainActivity : AppCompatActivity() {
         val urlInput: EditText = findViewById(R.id.urlInput)
         val downloadButton: Button = findViewById(R.id.downloadButton)
         val statusText: TextView = findViewById(R.id.statusText)
+        val statusBar: TextView = findViewById(R.id.statusBar) // Status bar for updates
 
         // Download button action
         downloadButton.setOnClickListener {
             val videoUrl = urlInput.text.toString()
             if (videoUrl.isNotEmpty()) {
+                statusBar.text = "Status: Processing..."
                 if (isYoutubeVideoLink(videoUrl)) {
-                    downloadYouTubeVideo(videoUrl, statusText)
+                    downloadYouTubeVideo(videoUrl, statusText, statusBar)
                 } else {
-                    downloadVideo(videoUrl, statusText)
+                    downloadVideo(videoUrl, statusText, statusBar)
                 }
             } else {
                 statusText.text = "Please enter a valid URL."
+                statusBar.text = "Status: Invalid input."
             }
         }
     }
 
+
     // Check if the URL is a YouTube video link
-    private fun isYoutubeVideoLink (url: String): Boolean {
+    private fun isYoutubeVideoLink(url: String): Boolean {
         val lowerCaseUrl = url.lowercase()
         return lowerCaseUrl.startsWith("https://www.youtube.com/") ||
                 lowerCaseUrl.startsWith("https://youtu.be/") ||
@@ -69,36 +73,52 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Download YouTube video using YoutubeDL
-    private fun downloadYouTubeVideo(videoUrl: String, statusText: TextView) {
-        val downloadDir = File(getExternalFilesDir(null), "downloads") // Directory for downloads
+    private fun downloadYouTubeVideo(videoUrl: String, statusText: TextView, statusBar: TextView) {
+        val downloadDir = File("/storage/emulated/0/Download/DeadMedia/YT") // Directory for downloads
         if (!downloadDir.exists()) downloadDir.mkdirs()
 
         val request = YoutubeDLRequest(videoUrl).apply {
             addOption("-o", "${downloadDir.absolutePath}/%(title)s.%(ext)s") // Output template
-            addOption("-f", "bestvideo+bestaudio/best") // Download best video+audio
+            addOption("-f", "bestvideo+bestaudio/best") // Download best video and audio
+            addOption("--merge-output-format", "mp4") // Merge video and audio into MP4
         }
 
         Thread {
             try {
+                runOnUiThread { statusBar.text = "Status: Downloading..." }
                 val response = YoutubeDL.getInstance().execute(request)
-                runOnUiThread { statusText.text = "Download complete: ${response.out}" }
+                runOnUiThread {
+                    statusText.text = "Download complete: ${response.out}"
+                    statusBar.text = "Status: Download complete."
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                runOnUiThread { statusText.text = "Failed to download: ${e.message}" }
+                runOnUiThread {
+                    statusText.text = "Failed to download: ${e.message}"
+                    statusBar.text = "Status: Download failed."
+                }
             }
         }.start()
     }
 
+
     // General video download method (uses Chaquopy and a Python script)
-    private fun downloadVideo(videoUrl: String, statusText: TextView) {
+    private fun downloadVideo(videoUrl: String, statusText: TextView, statusBar: TextView) {
         val python = Python.getInstance()
         val pyModule = python.getModule("downloader") // Reference to Python script
 
         try {
+            runOnUiThread { statusBar.text = "Status: Downloading..." }
             val result = pyModule.callAttr("download_video", videoUrl).toString()
-            statusText.text = result
+            runOnUiThread {
+                statusText.text = result
+                statusBar.text = "Status: Download complete."
+            }
         } catch (e: Exception) {
-            statusText.text = "Error: ${e.message}"
+            runOnUiThread {
+                statusText.text = "Error: ${e.message}"
+                statusBar.text = "Status: Download failed."
+            }
         }
     }
 }

@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Check if the URL is a YouTube video link
-    private fun isYoutubeVideoLink(url: String): Boolean {
+    private fun isYoutubeVideoLink (url: String): Boolean {
         val lowerCaseUrl = url.lowercase()
         return lowerCaseUrl.startsWith("https://www.youtube.com/") ||
                 lowerCaseUrl.startsWith("https://youtu.be/") ||
